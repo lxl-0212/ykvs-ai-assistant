@@ -118,6 +118,8 @@ function searchSchool(q) {
     }
   }
 
+  // 規範資料可以作為 AI 的內部背景，但只有使用者明確要求「法規／法條／條文」時，才把它當成正式法規查詢來呈現。
+  const explicitRegulationRequest = /法規|法條|條文|法令|第\s*\d+\s*條|規章原文|官方文件/.test(q);
   const lawMap = [
     ['手機|行動載具|平板|載具', 'mobile_device_policy.md', '行動載具管理規則'],
     ['品德|生活秩序|秩序競賽|班級競賽', 'conduct_and_class_order.md', '品德教育暨班級生活秩序競賽實施要點'],
@@ -129,7 +131,8 @@ function searchSchool(q) {
       const text = regulations[file] || '';
       const body = text.replace(/\s+/g, ' ');
       const idx = Math.max(0, body.toLowerCase().indexOf(cq.slice(0, Math.min(8, cq.length))));
-      out.push(`【${title}】\n${body.slice(idx, idx + 1800)}`);
+      // 一般自然語言問題也可以使用這些資料做內部理解，但不要讓使用者感覺自己被導去查法規。
+      out.push(`${explicitRegulationRequest ? `使用者明確要求法規資料：${title}` : `校務背景資料（供 AI 內部理解）：${title}`}\n${body.slice(idx, idx + 1800)}`);
     }
   }
 
@@ -138,15 +141,17 @@ function searchSchool(q) {
     const tokens = cq.split('').filter(Boolean).slice(0, 40);
     const score = tokens.filter(t => hay.includes(t)).length;
     if (score >= 4 && ['已人工核對','教師已核可','approved'].includes(String(row.review_status || ''))) {
-      out.push(`【${row.title}】\n${row.content}\n官方來源：${row.source_url || ''}\n最後檢核日期：${row.last_verified_date || ''}`);
+      out.push(`校務資料參考（僅供 AI 理解）：${row.title}\n${row.content}\n資料來源（只有使用者主動要求來源時才揭露）：${row.source_url || ''}\n最後檢核日期：${row.last_verified_date || ''}`);
     }
   }
 
   return [...new Set(out)].slice(0, 8).join('\n\n');
 }
 
-function buildSystemPrompt(context) {
-  return `你是「鶯歌工商校務 AI 助理」。請使用繁體中文回答。\n\n規則：\n1. 校務資料問題優先依據提供的校方資料回答，不要自行捏造。\n2. 如果資料沒有足夠證據，明確說明資料不足，並建議以校方最新公告為準。\n3. 回答分機、法規、行事曆時，盡量附上資料來源或來源網址（若資料有提供）。\n4. 保持簡潔、條列清楚。\n\n以下是本次問題從校務資料庫檢索到的內容：\n${context || '（本次沒有找到直接命中的校務資料。）'}`;
+function buildSystemPrompt(context, userQuestion='') {
+  const asksForSource = /來源|依據|出處|哪一條|第\s*\d+\s*條|原文|官方文件|文件連結/.test(userQuestion);
+  return `你是「鶯歌工商校務 AI 助理」。請使用繁體中文，以師生容易理解、快速得到重點的方式自然回答。\n\n核心原則：\n1. 使用者只需要用自然語言描述問題，不需要先判斷「要查哪個法規／哪個處室」。你要自己理解問題並從提供的校務資料中找答案。\n2. 校務資料（包含規範、請假、獎懲、行動載具等文件）可以作為 AI 的背景依據，但不要把回答寫成「請自行閱讀法規」或直接丟出法條。先用白話整理成使用者能立即理解的答案。\n3. 除非使用者明確說要查「法規、法條、條文、法令、哪一條、原文、官方文件」等，否則一律把校務規範當成內部背景資料，用自然語言白話回答；不要主動提到「法規查詢」，也不要叫使用者自己找法規。\n4. 開放性問題要先自然理解問題並直接回答，不要因為問題裡出現「成績、學分、學習歷程、請假」等詞就機械式把使用者導去查法規。\n5. 如果校務資料不足，誠實說明「目前資料不足」，不要自行捏造；必要時提醒使用者以學校最新公告為準。\n6. 回答簡潔、口語、條理清楚；能直接回答就不要要求使用者再做一次資料分類。\n7. ${asksForSource ? '使用者有要求來源，因此可以在白話答案後補充相關資料來源。' : '使用者沒有要求來源，因此不要主動揭露資料來源。'}
+8. 快速標籤只是自然語言提問範例，不代表法規查詢；即使問題涉及請假、獎懲、手機、成績或學分，也先直接回答使用者的實際問題。只有使用者明確要求法規／條文／依據時，才切換成法規或來源說明模式。\n\n以下是本次問題從校務資料庫取得的背景內容（請把它當作內部參考資料，不要原封不動貼給使用者）：\n${context || '（本次沒有找到直接命中的校務資料。）'}`;
 }
 
 async function askGemini(messages, context) {
@@ -164,7 +169,7 @@ async function askGemini(messages, context) {
     model: process.env.OPENAI_MODEL || 'gemini-3.1-flash-lite',
     max_tokens: 2048,
     messages: [
-      { role: 'system', content: buildSystemPrompt(context) },
+      { role: 'system', content: buildSystemPrompt(context, String(messages.at(-1)?.content ?? '')) },
       ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content ?? '') })).slice(-12)
     ]
   });
