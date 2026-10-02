@@ -1,22 +1,26 @@
-# 鶯歌工商校務 AI 助理｜動態網站新版
+# 鶯歌工商 YKVS Mini AI Assistant
 
-這個版本以 2026-10-02 的 YKVS Mini AI Assistant Notebook 設定為基礎，部署目標是 Render + Node.js + Express。
+這是一個可部署到 Render 的動態網站版本。
 
-## 核心設計
+## 架構
+- 前端：`public/index.html`
+- 後端：Node.js + Express (`server.js`)
+- 校務資料：`data/`
+- AI：Gemini OpenAI-compatible API
+- `/chat`：動態問答 API
+- `/health`：健康檢查
 
-- 使用者直接用自然語言提問，不需要先選「法規／處室／資料類型」。
-- 校務規範、請假、獎懲、行動載具等資料可以在後端作為 AI 的背景依據。
-- AI 優先把資料轉成白話、簡潔、容易理解的回答，不要求師生自行閱讀法規。
-- 只有使用者主動要求「來源、依據、哪一條、原文、官方文件」時，才補充來源資訊。
-- 開放式問題維持一般 AI 理解，不會因為出現成績、學分、學習歷程、請假等詞就機械式要求查法規。
-- `/health` 可供 Render 健康檢查。
+## Render 環境變數
+- `GEMINI_API_KEY`：Gemini API Key
+- `OPENAI_BASE_URL`：`https://generativelanguage.googleapis.com/v1beta/openai/`（可省略，server 有預設值）
+- `OPENAI_MODEL`：例如 `gemini-3.1-flash-lite`（可省略）
 
-## Render
+## 本機執行
+```bash
+npm install
+npm start
+```
 
-Build Command：`npm install`
+開啟 `http://localhost:3000`。
 
-Start Command：`npm start`
-
-Environment Variable：`GEMINI_API_KEY`
-
-不要把 API Key 寫進 GitHub。
+> 注意：不要把 API Key 寫進 GitHub，也不要把 `.env` 上傳。

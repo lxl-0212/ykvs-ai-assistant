@@ -65,7 +65,7 @@ textarea::placeholder{color:#a5b1b5}textarea:hover{border-color:#b9cbd0}textarea
 <header class="hero">
   <div class="brand">
     <div class="crest" aria-hidden="true">🎓</div>
-    <div><h1>鶯歌工商校務 AI 助理</h1><p class="sub">校園公開資料 × RAG × AI 自然語言問答</p></div>
+    <div><h1>鶯歌工商校務 AI 助理</h1><p class="sub">校園公開資料 × MCP × AI 快速查詢</p></div>
   </div>
   <div class="status">● 查詢服務</div>
 </header>
@@ -75,18 +75,18 @@ textarea::placeholder{color:#a5b1b5}textarea:hover{border-color:#b9cbd0}textarea
   <section class="card chat" aria-label="校務資料查詢">
     <div class="welcome">
       <div class="welcome-title"><strong>今天想查什麼？</strong><span class="mode-badge">AI 自然語言問答</span></div>
-      <span>不用先判斷處室，也不用先找法規；直接把問題告訴我，我會理解你的意思，再用校務資料與 AI 幫你整理成容易理解的回答。</span>
+      <span>不用先判斷處室，直接把問題告訴我；明確的校務資料會查校方資料，一般開放問題則交給 AI 理解與回答。</span>
       <div class="mode-hints" aria-label="查詢模式">
-        <span>💬 自然語言直接提問</span>
-        <span>🏫 AI 自動整理校務資料</span>
-        <span>✨ 白話快速回答</span>
+        <span>📚 法規／規定 → 附來源</span>
+        <span>🏫 校務資料 → MCP 快查</span>
+        <span>💬 開放問題 → AI 理解</span>
       </div>
     </div>
     <div id="log" role="log" aria-live="polite" aria-label="對話紀錄"></div>
 
     <div class="tag-section helper-section">
       <div class="tag-section-title">🔎 查詢小幫手</div>
-      <div class="helper-note">直接用平常說話的方式提問，不用先找法規或判斷是哪個處室；AI 會自己整理相關校務資訊。</div>
+      <div class="helper-note">點選標籤只是提供「提問範例」，不會直接送出。你可以先修改問題，再按「送出」。</div>
       <div class="quick-tags" aria-label="查詢小幫手提問分類">
         <button class="quick-tag other" data-query="XXX老師在哪個單位？">👨‍🏫 老師</button>
         <button class="quick-tag other" data-query="教務處的分機是多少？">☎️ 分機</button>
@@ -104,7 +104,8 @@ textarea::placeholder{color:#a5b1b5}textarea:hover{border-color:#b9cbd0}textarea
         <button class="quick-tag credit" data-query="重修通常要怎麼辦理？">📚 重修／補修</button>
         <button class="quick-tag credit" data-query="畢業需要符合哪些學分條件？">🎓 學分／畢業</button>
         <button class="quick-tag student" data-query="學習歷程要怎麼準備比較好？">🗂 學習歷程</button>
-              </div>
+        <button class="quick-tag student" data-query="如果我想查學務相關法規，可以看哪些資料？">📌 學務法規</button>
+      </div>
     </div>
     <div class="composer">
       <div class="composer-inner">
@@ -112,7 +113,7 @@ textarea::placeholder{color:#a5b1b5}textarea:hover{border-color:#b9cbd0}textarea
           <label class="composer-label" for="msg"><span class="dot"></span>輸入問題</label>
           <span class="composer-tip">Ctrl／⌘ + Enter 送出</span>
         </div>
-        <textarea id="msg" placeholder="例如：段考沒參加，我接下來可以怎麼辦？"></textarea>
+        <textarea id="msg" placeholder="例如：段考沒參加，可以申請補考嗎？"></textarea>
         <div class="actions">
           <span class="hint">可以繼續追問，AI 會保留本次對話脈絡</span>
           <div><button id="clear" class="clear" type="button">清除</button> <button id="send" type="button">送出　➜</button></div>
@@ -121,7 +122,7 @@ textarea::placeholder{color:#a5b1b5}textarea:hover{border-color:#b9cbd0}textarea
     </div>
   </section>
 </div>
-<footer>資料以鶯歌工商校方公開文件為基礎；AI 會將相關校務資料作為回答的背景依據，並以自然語言整理重點。若校務資訊有更新，請以學校最新公告為準。</footer>
+<footer>資料以鶯歌工商校方公開文件為基礎；明確校務查詢會優先使用校方資料，開放性問題則交由 AI 進行一般理解與回答。法規、考試與辦理期限如有更新，請以校方最新公告及正式文件為準。</footer>
 </main>
 
 <script>
