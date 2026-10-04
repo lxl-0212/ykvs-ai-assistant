@@ -1,19 +1,17 @@
-# 鶯歌工商 AI 分機／教室查詢 V2 修正版
+# YKVS AI Assistant — Stable Render Version
 
-這版修正兩個問題：
+這個版本把 MCP stdio server 改成 Python 標準函式庫實作，不依賴 Python `mcp` 套件，避免 Render 啟動時因 Python 套件或 FastMCP 版本造成服務退出。
 
-1. `資處科6D電腦教室分機` 不必輸入「6樓」也能命中校方資料。
-2. 分機／電話／教室查詢會先強制呼叫 MCP 查證，再用自然語言回答，不讓 LLM 在未查資料時自行猜測。
+## GitHub 根目錄
 
-請只覆蓋原專案中的：
-- backend-node/server.js
-- mcp-server-py/hello_tool.py
+`server.js`、`mcp-client.js`、`hello_tool.py`、`llm-client-openai.js`、`quick-reply.js`、`package.json`、`render.yaml`、`public/`、`data/` 必須位於同一個專案根目錄。
 
-不要刪除其他檔案。
+## Render
 
-測試：
-- 資處科6D電腦教室分機 → 應回答 764
-- 6D電腦教室電話多少 → 應回答 764
-- 我要查6樓資處科6D電腦教室分機 → 應回答 764
+Build Command: `npm install`
 
-若查不到資料，系統會明確說找不到，不會自行編造分機。
+Start Command: `node server.js`
+
+Health Check: `/healthz`
+
+如果設定 `GEMINI_API_KEY` 或 `OPENAI_API_KEY`，系統會使用 LLM 做自然語言整理；即使沒有 API Key，校務查詢仍會用 MCP 資料產生可讀的自然語言回答。
