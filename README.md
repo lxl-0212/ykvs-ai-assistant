@@ -1,22 +1,20 @@
-# 鶯歌工商校務 AI 助理｜動態網站新版
+# YKVS AI Assistant｜自然語言＋資料來源修正版
 
-這個版本以 2026-10-02 的 YKVS Mini AI Assistant Notebook 設定為基礎，部署目標是 Render + Node.js + Express。
+這次修改的目標：
 
-## 核心設計
+- 快速標籤不直接把法規原文丟給使用者。
+- 快速標籤與一般校務問題都交給 LLM 以自然語言整理。
+- 人名、職稱、單位、分機、行事曆、校務規定等校本資訊必須先經 MCP 查詢。
+- 找不到足夠校方資料時，不猜測、不自行補寫。
+- LLM 回答結尾自動附上「🔗 資料來源」，來源只取自 MCP 實際回傳的資料。
+- 日期、時間、天氣仍可走 Quick Reply，避免不必要的模型呼叫。
 
-- 使用者直接用自然語言提問，不需要先選「法規／處室／資料類型」。
-- 校務規範、請假、獎懲、行動載具等資料可以在後端作為 AI 的背景依據。
-- AI 優先把資料轉成白話、簡潔、容易理解的回答，不要求師生自行閱讀法規。
-- 只有使用者主動要求「來源、依據、哪一條、原文、官方文件」時，才補充來源資訊。
-- 開放式問題維持一般 AI 理解，不會因為出現成績、學分、學習歷程、請假等詞就機械式要求查法規。
-- `/health` 可供 Render 健康檢查。
+## 要覆蓋的檔案
 
-## Render
+把 `backend-node/` 內的 3 個檔案覆蓋到 GitHub 原專案同名位置：
 
-Build Command：`npm install`
+- `server.js`
+- `quick-reply.js`
+- `llm-client-openai.js`
 
-Start Command：`npm start`
-
-Environment Variable：`GEMINI_API_KEY`
-
-不要把 API Key 寫進 GitHub。
+其他檔案不要刪除。
