@@ -1,1 +1,2 @@
 # The MCP server is implemented with Python standard library only.
+gunicorn>=22.0
